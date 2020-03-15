@@ -1,0 +1,20 @@
+<div class="card" [ngClass]="'color' + card.color">
+  <h3 *ngIf="card.value < 10; else special">{{card.value}}</h3>
+  <ng-template #special>
+    <ng-container *ngIf="card.value === 10">
+      <h3>+2</h3>
+    </ng-container>
+    <ng-container *ngIf="card.value === 11">
+      <mat-icon>screen_rotation</mat-icon>
+    </ng-container>
+    <ng-container *ngIf="card.value === 12">
+      <mat-icon>not_interested</mat-icon>
+    </ng-container>
+    <ng-container *ngIf="card.value === 13">
+      <mat-icon>color_lens</mat-icon>
+    </ng-container>
+    <ng-container *ngIf="card.value === 14">
+      <h3>+4</h3>
+    </ng-container>
+  </ng-template>
+</div>

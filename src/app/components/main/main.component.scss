@@ -1,0 +1,43 @@
+div.table-card {
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  app-card {
+    transform: scale(4);
+  }
+}
+
+div.user-decks-container {
+  width: 100%;
+  bottom: 0;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  background-color: #063030;
+
+  div.user-deck-container {
+    flex-grow: 1;
+    border: 1px solid black;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: rgba(8, 153, 6, 0.31);
+
+    app-card {
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    div.actions {
+      position: fixed;
+      bottom: 0;
+    }
+  }
+}
+
+.disabled {
+  pointer-events: none;
+  background-color: rgba(153, 5, 0, 0.49) !important;
+}

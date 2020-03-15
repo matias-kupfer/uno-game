@@ -1,0 +1,36 @@
+div.card {
+  width: 50px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+
+  h3 {
+    font-size: 3em;
+  }
+}
+
+div.color0 {
+  border: solid red;
+}
+
+div.color1 {
+  border: solid blue;
+}
+
+div.color2 {
+  border: solid yellow;
+}
+
+div.color3 {
+  border: solid green;
+}
+
+div.color4 {
+  background-color: black;
+}
