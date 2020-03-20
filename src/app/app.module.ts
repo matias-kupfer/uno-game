@@ -8,7 +8,6 @@ import {AngularFireDatabaseModule} from '@angular/fire/database';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {MainComponent} from './components/main/main.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {CardComponent} from './components/card/card.component';
 import {
@@ -33,7 +32,6 @@ firebase.initializeApp(environment.firebase);
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent,
     CardComponent,
     IndexComponent,
     LobbyComponent,
