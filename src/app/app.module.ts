@@ -1,33 +1,64 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { MainComponent } from './components/main/main.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CardComponent } from './components/card/card.component';
-import {MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatRadioModule, MatSliderModule} from '@angular/material';
+import {HttpClientModule} from '@angular/common/http';
+import {AngularFireModule} from '@angular/fire';
+import {AngularFirestoreModule} from '@angular/fire/firestore';
+import {AngularFireDatabaseModule} from '@angular/fire/database';
+
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {MainComponent} from './components/main/main.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {CardComponent} from './components/card/card.component';
+import {
+  MatButtonModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule, MatProgressSpinnerModule,
+  MatRadioModule,
+  MatSliderModule,
+  MatSnackBarModule
+} from '@angular/material';
 import {FormsModule} from '@angular/forms';
+import {IndexComponent} from './components/index/index.component';
+import {LobbyComponent} from './components/lobby/lobby.component';
+import {environment} from '../environments/environment';
+
+
+import * as firebase from 'firebase/app';
+
+firebase.initializeApp(environment.firebase);
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
-    CardComponent
+    CardComponent,
+    IndexComponent,
+    LobbyComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    HttpClientModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
+    AngularFireDatabaseModule,
+    // material
     MatIconModule,
     MatSliderModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatRadioModule
+    MatRadioModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

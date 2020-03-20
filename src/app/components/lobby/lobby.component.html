@@ -1,0 +1,64 @@
+<ng-container style="margin-left: 20px" *ngIf="game; else loader">
+  <h1>lobby</h1>
+  <h3>Game --> {{game.gameId}}</h3>
+  <h3>Password --> {{game.password}}</h3>
+  <h3>Player turn --> {{game.players[game.playerTurn]}}</h3>
+  <br>
+  <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
+    <button mat-flat-button *ngIf=" game.players[0] === this.userName && game.players.length >= 2"
+            (click)="startGame()"
+            color="accent">
+      start
+    </button>
+    <div *ngFor="let player of game.players; let i = index">
+      <h3 [ngStyle]="{'color' : i=== 0 ? 'green' : ''}">{{player}}</h3>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="game.gameStarted"> <!-- GAME STARTED -->
+    <!--select color-->
+    <div *ngIf="this.game.tableColor !== null"
+         [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' : 'green'}"
+         style="width: 100px; height: 100px"></div>
+    <ng-container *ngIf="this.game.tableColor === null">
+      <label id="example-radio-group-label">Pick color</label>
+      <mat-radio-group (change)="changeColor()" [(ngModel)]="this.game.tableColor">
+        <mat-radio-button [value]="0">
+          red
+        </mat-radio-button>
+        <mat-radio-button [value]="1">
+          blue
+        </mat-radio-button>
+        <mat-radio-button [value]="2">
+          yellow
+        </mat-radio-button>
+        <mat-radio-button [value]="3">
+          green
+        </mat-radio-button>
+      </mat-radio-group>
+    </ng-container>
+    <div class="table-card">
+      <app-card [card]="this.game.tableCard[this.game.tableCard.length - 1]"></app-card>
+    </div>
+    <br><br><br><br>
+    <div class="user-deck-container"
+         [ngClass]="{'disabled': (this.game.players[this.game.playerTurn] !== this.userName || this.game.tableColor === null)}">
+      <app-card *ngFor="let card of playerDeck; let i = index" [card]="card" (click)="cardToTable(i)"></app-card>
+      <br>
+      <button mat-flat-button color="accent" [disabled]="
+      this.game.players[this.game.playerTurn] !== this.userName || this.game.drawCardsCounter !== 0 ||
+      this.game.lastUserCard !== null"
+              (click)="drawCard()">
+        Draw card
+      </button>
+      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.userName"
+              (click)="nextPlayer()">
+        Next player
+      </button>
+    </div>
+  </ng-container>
+</ng-container>
+
+
+<ng-template #loader>
+  <mat-spinner (progress)="50" color="accent"></mat-spinner>
+</ng-template>

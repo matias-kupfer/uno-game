@@ -40,7 +40,7 @@ export class DeckService {
         this.deck.push(newCard);
       }
     }
-    return this.deck;
+    return this.mixDeck(this.deck);
   }
 
   public mixDeck(deck: Card[]) {

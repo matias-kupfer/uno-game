@@ -1,0 +1,29 @@
+<h1>Welcome to UNO | By Matias Kupfer</h1>
+<h3>CREATE A GAME</h3>
+<mat-form-field appearance="outline">
+  <mat-label>Game name</mat-label>
+  <label>
+    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="gameId">
+  </label>
+</mat-form-field>
+<mat-form-field appearance="outline">
+  <mat-label>Game password</mat-label>
+  <label>
+    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="gamePassword">
+  </label>
+</mat-form-field>
+<mat-form-field appearance="outline">
+  <mat-label>Username</mat-label>
+  <label>
+    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="userName">
+  </label>
+</mat-form-field>
+<button mat-flat-button color="primary"
+        [disabled]="!gameId || !gamePassword || !userName" (click)="createGame()">
+  Create Game
+</button>
+<button mat-flat-button color="primary"
+        [disabled]="!gameId || !gamePassword || !userName" (click)="joinGame()">
+  Join Game
+</button>
+<hr>
