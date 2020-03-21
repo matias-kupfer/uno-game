@@ -36,7 +36,6 @@ export class FirestoreService {
           this.player = userName;
           this.$game.next(res.data() as Game);
         } else {
-          console.log(res.data());
           this.snackBar.open('access denied for some fucking reason', '', {
             duration: 3000
           });
@@ -80,7 +79,6 @@ export class FirestoreService {
     const cards = this.$game.getValue().deck.slice(0, quantity);
     this.$game.getValue().deck.splice(0, quantity);
     this.updateGame();
-    console.log(cards);
     return cards;
   }
 
@@ -96,23 +94,16 @@ export class FirestoreService {
   async updatePlayersDeck(playerDeck: Card[], player: string) {
     await this.db.collection('games').doc(this.$game.getValue().gameId).collection(player).doc('playerDeck')
       .set({
-        playerDeck: FieldValue.arrayUnion(JSON.parse(JSON.stringify(playerDeck))),
+        playerDeck: JSON.parse(JSON.stringify(playerDeck)),
       });
   }
 
   public checkValidUser(gamePlayersList: string[], userName: string) {
-    console.log(gamePlayersList);
-    console.log(userName);
     for (const user of gamePlayersList) {
       if (user === userName) {
-        console.log('is valid');
         return true;
       }
     }
-    console.log('not valid');
-    console.log('------------------');
-    console.log('------------------');
-    console.log('------------------');
     return false;
   }
 }

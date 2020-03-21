@@ -3,6 +3,9 @@
   <h3>Game --> {{game.gameId}}</h3>
   <h3>Password --> {{game.password}}</h3>
   <h3>Player turn --> {{game.players[game.playerTurn]}}</h3>
+  <h3
+    [ngStyle]="{'color' : game.deck.length > 30 ? 'green' : game.deck.length < 30 && game.deck.length > 10 ? 'orange' : 'red'}">
+    Cards remaining --> {{game.deck.length}}</h3>
   <br>
   <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
     <button mat-flat-button *ngIf=" game.players[0] === this.userName && game.players.length >= 2"
@@ -15,9 +18,12 @@
     </div>
   </ng-container>
   <ng-container *ngIf="game.gameStarted"> <!-- GAME STARTED -->
-    <!--select color-->
+    <div *ngFor="let player of game.players; let i = index">
+      <h3 [ngStyle]="{'color' : i === this.game.playerTurn ? 'green' : ''}">{{player}}</h3>
+    </div>    <!--select color-->
     <div *ngIf="this.game.tableColor !== null"
-         [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' : 'green'}"
+         [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' :
+         this.game.tableColor === 2 ? 'yellow' : 'green'}"
          style="width: 100px; height: 100px"></div>
     <ng-container *ngIf="this.game.tableColor === null">
       <label id="example-radio-group-label">Pick color</label>
@@ -50,7 +56,8 @@
               (click)="drawCard()">
         Draw card
       </button>
-      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.userName"
+      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.userName ||
+    !this.game.userDrawCard && this.game.lastUserCard === null"
               (click)="nextPlayer()">
         Next player
       </button>

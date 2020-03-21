@@ -38,11 +38,11 @@ export class LobbyComponent implements OnInit {
   }
 
   public startGame() {
-    this.firestoreService.startGame(this.gameId, this.game).then(() => {
-    }).catch(() => {
+    this.firestoreService.startGame(this.gameId, this.game).catch((e) => {
       this.snackBar.open('error starting the game', '', {
         duration: 3000
       });
+      console.log(e);
     });
   }
 

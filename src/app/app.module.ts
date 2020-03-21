@@ -26,6 +26,7 @@ import {environment} from '../environments/environment';
 
 
 import * as firebase from 'firebase/app';
+import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 
 firebase.initializeApp(environment.firebase);
 
@@ -55,7 +56,7 @@ firebase.initializeApp(environment.firebase);
     MatSnackBarModule,
     MatProgressSpinnerModule
   ],
-  providers: [],
+  providers: [Location, {provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]
 })
 export class AppModule {
