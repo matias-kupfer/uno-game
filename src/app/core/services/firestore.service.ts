@@ -1,13 +1,18 @@
-import {Injectable} from '@angular/core';
-import * as firebase from 'firebase';
-import {DocumentData} from '@angular/fire/firestore';
-import {DeckService} from './deck.service';
-import {Card} from '../../Class/card';
-import {Game} from '../../interfaces/game';
-import {BehaviorSubject} from 'rxjs';
-import {MatSnackBar} from '@angular/material';
 import {Router} from '@angular/router';
+import {Injectable} from '@angular/core';
+import {MatSnackBar} from '@angular/material';
+import {DocumentData} from '@angular/fire/firestore';
+
+import * as firebase from 'firebase';
+
+import {BehaviorSubject} from 'rxjs';
+// User defined
+import {Game} from '../../interfaces';
+import {DeckService} from './deck.service';
+import {Collection, FirebaseDoc, UnoParams} from '../../enums';
+import editable from '../../functions/editable.function';
 import FieldValue = firebase.firestore.FieldValue;
+import {Card} from '../../class/card';
 
 
 @Injectable({
@@ -17,14 +22,22 @@ export class FirestoreService {
   public db = firebase.firestore();
   public $game: BehaviorSubject<Game> = new BehaviorSubject<Game>(null);
   public $playerDeck: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(null);
+  /**
+   * The Username of the player
+   * TODO: Use a User Interface instead
+   */
   public player: string;
+
+  /**
+   * @unused
+   */
   public x = 0;
 
   constructor(private deckService: DeckService, private snackBar: MatSnackBar, private router: Router) {
   }
 
   public connectGame(gameId: string, userName: string): DocumentData {
-    return this.db.collection('games').doc(gameId).onSnapshot((res) => {
+    return this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
         if (this.checkValidUser(res.data().players, userName)) {
           if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) { // game started
@@ -51,25 +64,25 @@ export class FirestoreService {
   }
 
   public startGame(gameId: string, game: Game) {
-    this.generatePlayerDecks().then(r => {
+    this.generatePlayerDecks().then((r) => {
     });
-    const tableCard = this.drawCards(1)[0];
-    return this.db.collection('games').doc(gameId).update(
+    const tableCard = this.drawCards(UnoParams.CardsDrawnIfNothing)[0];
+    return this.db.collection(Collection.Games).doc(gameId).update(
       {
         gameStarted: true,
         playerTurn: Math.floor(Math.random() * game.players.length),
-        tableCard: FieldValue.arrayUnion(JSON.parse(JSON.stringify(tableCard))),
+        tableCard: FieldValue.arrayUnion(editable(tableCard)),
         tableColor: tableCard.color
       });
   }
 
   public updateGame(/*game: Game*/) {
-    this.db.collection('games').doc(this.$game.getValue().gameId)
-      .set(JSON.parse(JSON.stringify(this.$game.getValue())));
+    this.db.collection(Collection.Games).doc(this.$game.getValue().gameId)
+      .set(editable(this.$game.getValue()));
   }
 
   public playerDeckSubscription() {
-    this.db.collection('games').doc(this.$game.getValue().gameId).collection(this.player).doc('playerDeck')
+    this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(this.player).doc(FirebaseDoc.PlayerDeck)
       .onSnapshot(updatedPlayerDeck => {
         this.$playerDeck.next(updatedPlayerDeck.data().playerDeck);
       });
@@ -84,17 +97,17 @@ export class FirestoreService {
 
   async generatePlayerDecks() {
     for (const player of this.$game.getValue().players) {
-      await this.db.collection('games').doc(this.$game.getValue().gameId).collection(player).doc('playerDeck')
+      await this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(player).doc(FirebaseDoc.PlayerDeck)
         .set({
-          playerDeck: this.drawCards(7),
+          playerDeck: this.drawCards(UnoParams.InitialCardsDrawn),
         });
     }
   }
 
   async updatePlayersDeck(playerDeck: Card[], player: string) {
-    await this.db.collection('games').doc(this.$game.getValue().gameId).collection(player).doc('playerDeck')
+    await this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(player).doc(FirebaseDoc.PlayerDeck)
       .set({
-        playerDeck: JSON.parse(JSON.stringify(playerDeck)),
+        playerDeck: editable(playerDeck),
       });
   }
 
