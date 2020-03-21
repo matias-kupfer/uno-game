@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {ApiService} from '../../core/services/api.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FirestoreService} from '../../core/services/firestore.service';
-import {MatSnackBar} from '@angular/material';
-import {Game} from '../../interfaces/game';
-import {Card} from '../../Class/card';
+import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../../core/services/api.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FirestoreService } from '../../core/services/firestore.service';
+import { MatSnackBar } from '@angular/material';
+import { Game } from '../../interfaces';
+import { Card } from '../../class/card';
+
 
 @Component({
   selector: 'app-lobby',
