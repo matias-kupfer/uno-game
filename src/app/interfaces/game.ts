@@ -1,5 +1,5 @@
-import {Card} from '../Class/card';
-import {Deck} from '../Class/deck';
+import { Card } from '../class/card';
+
 
 export interface Game {
   gameId: string;

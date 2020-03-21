@@ -22,5 +22,12 @@
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
+  },
+  "paths": {
+    "~app/*": ["app/*"],
+    "~enums/*": ["app/enums/*"],
+    "~services/*": ["app/core/services/*"],
+    "~interfaces/*": ["app/interfaces/*"],
+    "~constants/*": ["app/constants/*"]
   }
 }

@@ -1,5 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Card} from '../../Class/card';
+import { Component, Input, OnInit } from '@angular/core';
+import { Card } from '../../class/card';
+
 
 @Component({
   selector: 'app-card',

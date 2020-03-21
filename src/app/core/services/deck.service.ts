@@ -1,5 +1,6 @@
-import {Injectable} from '@angular/core';
-import {Card} from '../../Class/card';
+import { Injectable } from '@angular/core';
+import { Card } from '../../class/card';
+
 
 @Injectable({
   providedIn: 'root'
