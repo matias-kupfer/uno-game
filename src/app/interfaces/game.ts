@@ -1,5 +1,4 @@
 import {Card} from '../Class/card';
-import {Deck} from '../Class/deck';
 
 export interface Game {
   gameId: string;
