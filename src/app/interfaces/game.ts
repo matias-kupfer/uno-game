@@ -6,8 +6,10 @@ export interface Game {
   password: string;
   players: string[];
   deck: Card[];
-  playersDeck: [Card[]];
   gameStarted: boolean;
+  gameFinished: boolean;
+  nextPlayerCounter: number;
+  winners: [string];
   tableCard: Card[];
   playerTurn: number;
   userDrawCard: boolean;

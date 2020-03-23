@@ -2,10 +2,12 @@
   <h1>lobby</h1>
   <h3>Game --> {{game.gameId}}</h3>
   <h3>Password --> {{game.password}}</h3>
-  <h3>Player turn --> {{game.players[game.playerTurn]}}</h3>
-  <h3
-    [ngStyle]="{'color' : game.deck.length > 30 ? 'green' : game.deck.length < 30 && game.deck.length > 10 ? 'orange' : 'red'}">
-    Cards remaining --> {{game.deck.length}}</h3>
+  <div *ngIf="!game.gameFinished">
+    <h3>Player turn --> {{game.players[game.playerTurn]}}</h3>
+    <h3
+      [ngStyle]="{'color' : game.deck.length > 30 ? 'green' : game.deck.length < 30 && game.deck.length > 10 ? 'orange' : 'red'}">
+      Cards remaining --> {{game.deck.length}}</h3>
+  </div>
   <br>
   <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
     <button mat-flat-button *ngIf=" game.players[0] === this.userName && game.players.length >= 2"
@@ -17,7 +19,7 @@
       <h3 [ngStyle]="{'color' : i=== 0 ? 'green' : ''}">{{player}}</h3>
     </div>
   </ng-container>
-  <ng-container *ngIf="game.gameStarted"> <!-- GAME STARTED -->
+  <ng-container *ngIf="game.gameStarted && !this.game.gameFinished"> <!-- GAME STARTED -->
     <div *ngFor="let player of game.players; let i = index">
       <h3 [ngStyle]="{'color' : i === this.game.playerTurn ? 'green' : ''}">{{player}}</h3>
     </div>    <!--select color-->
@@ -52,16 +54,22 @@
       <br>
       <button mat-flat-button color="accent" [disabled]="
       this.game.players[this.game.playerTurn] !== this.userName || this.game.drawCardsCounter !== 0 ||
-      this.game.lastUserCard !== null"
+      this.game.lastUserCard !== null || this.game.deck.length === 0"
               (click)="drawCard()">
         Draw card
       </button>
       <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.userName ||
-    !this.game.userDrawCard && this.game.lastUserCard === null"
+    !this.game.userDrawCard && this.game.lastUserCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0"
               (click)="nextPlayer()">
         Next player
       </button>
     </div>
+  </ng-container>
+
+  <ng-container *ngIf="this.game.gameFinished"> <!-- GAME FINISHED -->
+    <h1>GAME HAS ENDED</h1>
+    <h3>Winner/s: </h3>
+    <h3 *ngFor="let winner of game.winners">{{winner}}</h3>
   </ng-container>
 </ng-container>
 

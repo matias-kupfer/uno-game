@@ -22,16 +22,7 @@ export class FirestoreService {
   public db = firebase.firestore();
   public $game: BehaviorSubject<Game> = new BehaviorSubject<Game>(null);
   public $playerDeck: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(null);
-  /**
-   * The Username of the player
-   * TODO: Use a User Interface instead
-   */
   public player: string;
-
-  /**
-   * @unused
-   */
-  public x = 0;
 
   constructor(private deckService: DeckService, private snackBar: MatSnackBar, private router: Router) {
   }
@@ -45,6 +36,11 @@ export class FirestoreService {
               duration: 3000
             });
             this.playerDeckSubscription();
+          }
+          if (res.data().gameFinished === true && !this.$game.getValue().gameFinished) { // game finished
+            this.snackBar.open('game finished', '', {
+              duration: 3000
+            });
           }
           this.player = userName;
           this.$game.next(res.data() as Game);
@@ -76,7 +72,7 @@ export class FirestoreService {
       });
   }
 
-  public updateGame(/*game: Game*/) {
+  public updateGame() {
     this.db.collection(Collection.Games).doc(this.$game.getValue().gameId)
       .set(editable(this.$game.getValue()));
   }
@@ -118,5 +114,9 @@ export class FirestoreService {
       }
     }
     return false;
+  }
+
+  async getPlayersDeck(player: string) {
+    return this.db.collection('games').doc(this.$game.getValue().gameId).collection(player).doc('playerDeck').get();
   }
 }

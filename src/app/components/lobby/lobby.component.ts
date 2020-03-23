@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../core/services/api.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FirestoreService } from '../../core/services/firestore.service';
-import { MatSnackBar } from '@angular/material';
-import { Game } from '../../interfaces';
-import { Card } from '../../class/card';
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from '../../core/services/api.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FirestoreService} from '../../core/services/firestore.service';
+import {MatSnackBar} from '@angular/material';
+import {Game} from '../../interfaces';
+import {Card} from '../../class/card';
 
 
 @Component({
@@ -22,8 +22,7 @@ export class LobbyComponent implements OnInit {
     private apiService: ApiService,
     private firestoreService: FirestoreService,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar,
-    private router: Router) {
+    private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
@@ -50,17 +49,13 @@ export class LobbyComponent implements OnInit {
   // THROW CARD
   public cardToTable(cardPosition: number) {
     const card: Card = this.playerDeck[cardPosition];
-    if (this.game.lastUserCard !== null && this.game.lastUserCard.value !== card.value) {
-      return; // not same card as before
-    }
-    if (this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 14 && card.value !== 14) {
+    if (this.game.lastUserCard !== null && this.game.lastUserCard.value !== card.value ||
+      this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 14 && card.value !== 14 ||
+      this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 10 && card.value !== 10) {
       return;
     }
-    if (this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 10 && card.value !== 10) {
-      return;
-    }
-    const isValidMove = this.isValidMove(card);
-    if (isValidMove) {
+    if (this.isValidMove(card)) {
+      this.game.nextPlayerCounter = 0;
       switch (card.value) {
         case 0 - 9:
           break;
@@ -116,6 +111,13 @@ export class LobbyComponent implements OnInit {
 
   // PLAYER ACTIONS
   public drawCard() {
+    if (this.game.deck.length === 0) {
+      this.snackBar.open('No more cards', '', {
+        duration: 3000
+      });
+      this.game.drawCardsCounter = 0;
+      return;
+    }
     this.game.userDrawCard = true;
     this.playerDeck.push(this.firestoreService.drawCards(1)[0]);
   }
@@ -125,15 +127,29 @@ export class LobbyComponent implements OnInit {
   }
 
   public nextPlayer() {
-    if (!this.game.userDrawCard) {
-      for (let i = 0; i < this.game.drawCardsCounter; i++) {
-        this.playerDeck.push(this.firestoreService.drawCards(1)[0]);
-      }
-      this.game.drawCardsCounter = 0;
+    if (this.game.drawCardsCounter === 0 && this.playerDeck.length === 0) {
+      this.game.gameFinished = true; // game finished
+      this.game.winners.push(this.userName);
     }
-    if (this.game.skipTurnCounter === 0) {
+    if (this.game.nextPlayerCounter === this.game.players.length - 1) {
+      this.game.gameFinished = true; // game finished
+      this.setWinners();
+    }
+    if (!this.game.userDrawCard) {
+      if (this.game.drawCardsCounter !== 0) {
+        for (let i = 0; i < this.game.drawCardsCounter; i++) {
+          this.drawCard();
+        }
+        this.game.drawCardsCounter = 0;
+        this.game.nextPlayerCounter = 0;
+      } else if (!this.game.lastUserCard) {
+        this.game.nextPlayerCounter++;
+      }
+    }
+    if (this.game.skipTurnCounter === 0 && (this.game.players.length > 2 ||
+      this.game.lastUserCard === null || this.game.lastUserCard.value !== 11)) {
       this.increasePlayerTurn();
-    } else {
+    } else if (this.game.players.length > 2) {
       for (let i = 0; i <= this.game.skipTurnCounter; i++) {
         this.increasePlayerTurn();
       }
@@ -154,5 +170,35 @@ export class LobbyComponent implements OnInit {
     } else {
       !this.game.reverseDirection ? this.game.playerTurn++ : this.game.playerTurn--;
     }
+  }
+
+  public setWinners() {
+    this.getPlayersDeck().then(playersDeck => {
+      let winners = [playersDeck[0]];
+      for (let i = 1; i < playersDeck.length; i++) {
+        if (playersDeck[i].playerDeckLength < winners[0].playerDeckLength) {
+          winners = playersDeck[i];
+        } else if (playersDeck[i].playerDeckLength === winners[0].playerDeckLength) {
+          winners.push(playersDeck[i]);
+        }
+      }
+      for (const winner of winners) {
+        this.game.winners.push(winner.playerName);
+      }
+      this.firestoreService.updateGame();
+    });
+  }
+
+  async getPlayersDeck() {
+    const playersDeck = [];
+    for (const player of this.game.players) {
+      await this.firestoreService.getPlayersDeck(player).then(playerDeck => {
+        playersDeck.push({
+          playerName: player,
+          playerDeckLength: playerDeck.data().playerDeck.length
+        });
+      });
+    }
+    return playersDeck;
   }
 }
