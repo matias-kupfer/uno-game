@@ -9,8 +9,12 @@ export interface Game {
   gameStarted: boolean;
   gameFinished: boolean;
   nextPlayerCounter: number;
-  winners: [string];
+  winners: string[];
   tableCard: Card[];
+  decksLength: [{
+    player: string,
+    length: number
+  }];
   playerTurn: number;
   userDrawCard: boolean;
   skipTurnCounter: number;

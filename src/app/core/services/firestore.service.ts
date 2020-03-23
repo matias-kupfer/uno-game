@@ -21,8 +21,10 @@ import {Card} from '../../class/card';
 export class FirestoreService {
   public db = firebase.firestore();
   public $game: BehaviorSubject<Game> = new BehaviorSubject<Game>(null);
+  public $timer: BehaviorSubject<number> = new BehaviorSubject<number>(null);
   public $playerDeck: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(null);
   public player: string;
+  public turnInterval: number;
 
   constructor(private deckService: DeckService, private snackBar: MatSnackBar, private router: Router) {
   }
@@ -42,6 +44,9 @@ export class FirestoreService {
               duration: 3000
             });
           }
+          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) { // user turn
+            this.timer();
+          }
           this.player = userName;
           this.$game.next(res.data() as Game);
         } else {
@@ -60,16 +65,38 @@ export class FirestoreService {
   }
 
   public startGame(gameId: string, game: Game) {
-    this.generatePlayerDecks().then((r) => {
-    });
+    this.generatePlayerDecks();
     const tableCard = this.drawCards(UnoParams.CardsDrawnIfNothing)[0];
     return this.db.collection(Collection.Games).doc(gameId).update(
       {
         gameStarted: true,
         playerTurn: Math.floor(Math.random() * game.players.length),
         tableCard: FieldValue.arrayUnion(editable(tableCard)),
-        tableColor: tableCard.color
+        tableColor: tableCard.color,
+        decksLength: this.deckLengthInit(game),
       });
+  }
+
+  public deckLengthInit(game: Game) {
+    const decksLength = [];
+    for (const player of game.players) {
+      decksLength.push({
+        player,
+        length: 7
+      });
+    }
+    return decksLength;
+  }
+
+  public timer() {
+    clearInterval(this.turnInterval);
+    this.$timer.next(20);
+    this.turnInterval = setInterval(() => {
+      this.$timer.next(this.$timer.getValue() - 1);
+      if (this.$timer.getValue() === 0) {
+        return;
+      }
+    }, 1000);
   }
 
   public updateGame() {
@@ -91,10 +118,11 @@ export class FirestoreService {
     return cards;
   }
 
-  async generatePlayerDecks() {
+  public generatePlayerDecks() {
     for (const player of this.$game.getValue().players) {
-      await this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(player).doc(FirebaseDoc.PlayerDeck)
+      this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(player).doc(FirebaseDoc.PlayerDeck)
         .set({
+          player,
           playerDeck: this.drawCards(UnoParams.InitialCardsDrawn),
         });
     }

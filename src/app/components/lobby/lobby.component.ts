@@ -17,6 +17,7 @@ export class LobbyComponent implements OnInit {
   public playerDeck: Card[] = null;
   public gameId: string = this.route.snapshot.paramMap.get('gameId');
   public userName: string = this.route.snapshot.paramMap.get('userName');
+  public timer: number = null;
 
   constructor(
     private apiService: ApiService,
@@ -31,6 +32,7 @@ export class LobbyComponent implements OnInit {
     this.firestoreService.$playerDeck.subscribe(updatedPlayerDeck => {
       this.playerDeck = updatedPlayerDeck;
     });
+    this.timerSubscription();
   }
 
   public connectToGame() {
@@ -43,6 +45,17 @@ export class LobbyComponent implements OnInit {
         duration: 3000
       });
       console.log(e);
+    });
+  }
+
+  public timerSubscription() {
+    this.firestoreService.$timer.subscribe(timer => {
+      this.timer = timer;
+      if (timer === 0) {
+        this.drawCard();
+        this.drawCard();
+        this.nextPlayer();
+      }
     });
   }
 
@@ -98,7 +111,6 @@ export class LobbyComponent implements OnInit {
 
   public isSameColor(card: Card) {
     return this.game.tableColor === card.color;
-    // return this.tableCard[this.tableCard.length - 1].color === card.color;
   }
 
   public isSameNumber(card: Card) {
@@ -127,10 +139,6 @@ export class LobbyComponent implements OnInit {
   }
 
   public nextPlayer() {
-    if (this.game.drawCardsCounter === 0 && this.playerDeck.length === 0) {
-      this.game.gameFinished = true; // game finished
-      this.game.winners.push(this.userName);
-    }
     if (this.game.nextPlayerCounter === this.game.players.length - 1) {
       this.game.gameFinished = true; // game finished
       this.setWinners();
@@ -145,6 +153,10 @@ export class LobbyComponent implements OnInit {
       } else if (!this.game.lastUserCard) {
         this.game.nextPlayerCounter++;
       }
+    }
+    this.game.decksLength[this.game.playerTurn] = {player: this.userName, length: this.playerDeck.length};
+    if (this.game.drawCardsCounter === 0) {
+      this.checkForWinner();
     }
     if (this.game.skipTurnCounter === 0 && (this.game.players.length > 2 ||
       this.game.lastUserCard === null || this.game.lastUserCard.value !== 11)) {
@@ -172,33 +184,28 @@ export class LobbyComponent implements OnInit {
     }
   }
 
-  public setWinners() {
-    this.getPlayersDeck().then(playersDeck => {
-      let winners = [playersDeck[0]];
-      for (let i = 1; i < playersDeck.length; i++) {
-        if (playersDeck[i].playerDeckLength < winners[0].playerDeckLength) {
-          winners = playersDeck[i];
-        } else if (playersDeck[i].playerDeckLength === winners[0].playerDeckLength) {
-          winners.push(playersDeck[i]);
-        }
+  public checkForWinner() {
+    for (const playerDeck of this.game.decksLength) {
+      if (playerDeck.length === 0) {
+        this.game.gameFinished = true; // game finished
+        this.game.winners.push(playerDeck.player);
+        break;
       }
-      for (const winner of winners) {
-        this.game.winners.push(winner.playerName);
-      }
-      this.firestoreService.updateGame();
-    });
+    }
   }
 
-  async getPlayersDeck() {
-    const playersDeck = [];
-    for (const player of this.game.players) {
-      await this.firestoreService.getPlayersDeck(player).then(playerDeck => {
-        playersDeck.push({
-          playerName: player,
-          playerDeckLength: playerDeck.data().playerDeck.length
-        });
-      });
+  public setWinners() {
+    let winners = [this.game.decksLength[0]];
+    for (let i = 1; i < this.game.decksLength.length; i++) {
+      if (this.game.decksLength[i].length < winners[0].length) {
+        winners = [this.game.decksLength[i]];
+      } else if (this.game.decksLength[i].length === winners[0].length) {
+        winners.push(this.game.decksLength[i]);
+      }
     }
-    return playersDeck;
+    for (const winner of winners) {
+      this.game.winners.push(winner.player);
+    }
+    this.firestoreService.updateGame();
   }
 }

@@ -9,6 +9,8 @@
       Cards remaining --> {{game.deck.length}}</h3>
   </div>
   <br>
+
+
   <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
     <button mat-flat-button *ngIf=" game.players[0] === this.userName && game.players.length >= 2"
             (click)="startGame()"
@@ -19,10 +21,18 @@
       <h3 [ngStyle]="{'color' : i=== 0 ? 'green' : ''}">{{player}}</h3>
     </div>
   </ng-container>
+
+
   <ng-container *ngIf="game.gameStarted && !this.game.gameFinished"> <!-- GAME STARTED -->
     <div *ngFor="let player of game.players; let i = index">
-      <h3 [ngStyle]="{'color' : i === this.game.playerTurn ? 'green' : ''}">{{player}}</h3>
-    </div>    <!--select color-->
+      <h3 [ngStyle]="{'color' : i === this.game.playerTurn ? 'green' : ''}">{{player}} -
+        {{this.game.decksLength[i].length}} cards</h3>
+    </div>
+
+    <!--Timer-->
+    <h3 *ngIf="this.game.players[this.game.playerTurn] === this.userName">time left ---> {{timer}}</h3>
+
+    <!--select color-->
     <div *ngIf="this.game.tableColor !== null"
          [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' :
          this.game.tableColor === 2 ? 'yellow' : 'green'}"
@@ -44,6 +54,7 @@
         </mat-radio-button>
       </mat-radio-group>
     </ng-container>
+
     <div class="table-card">
       <app-card [card]="this.game.tableCard[this.game.tableCard.length - 1]"></app-card>
     </div>
@@ -54,7 +65,7 @@
       <br>
       <button mat-flat-button color="accent" [disabled]="
       this.game.players[this.game.playerTurn] !== this.userName || this.game.drawCardsCounter !== 0 ||
-      this.game.lastUserCard !== null || this.game.deck.length === 0"
+      this.game.lastUserCard !== null || this.game.deck.length === 0 || this.game.userDrawCard"
               (click)="drawCard()">
         Draw card
       </button>
@@ -65,6 +76,7 @@
       </button>
     </div>
   </ng-container>
+
 
   <ng-container *ngIf="this.game.gameFinished"> <!-- GAME FINISHED -->
     <h1>GAME HAS ENDED</h1>
