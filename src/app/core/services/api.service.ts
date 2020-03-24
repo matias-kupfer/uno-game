@@ -11,11 +11,11 @@ export class ApiService {
 
   }
 
-  public createGame(gameId: string, gamePassword: string, userName: string) {
-    return this.http.post(`${environment.url}/api/create-game/${gameId}/${gamePassword}/${userName}`, {});
+  public createGame(gameId: string, gamePassword: string, player: string) {
+    return this.http.post(`${environment.url}/api/create-game/${gameId}/${gamePassword}/${player}`, {});
   }
 
-  public joinGame(gameId: string, gamePassword: string, userName: string) {
-    return this.http.post(`${environment.url}/api/join-game/${gameId}/${gamePassword}/${userName}`, {});
+  public joinGame(gameId: string, gamePassword: string, player: string) {
+    return this.http.post(`${environment.url}/api/join-game/${gameId}/${gamePassword}/${player}`, {});
   }
 }

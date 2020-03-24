@@ -16,7 +16,7 @@ export class LobbyComponent implements OnInit {
   public game: Game = null;
   public playerDeck: Card[] = null;
   public gameId: string = this.route.snapshot.paramMap.get('gameId');
-  public userName: string = this.route.snapshot.paramMap.get('userName');
+  public player: string = this.route.snapshot.paramMap.get('player');
   public timer: number = null;
 
   constructor(
@@ -27,16 +27,12 @@ export class LobbyComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.connectToGame();
+    this.firestoreService.connectGame(this.gameId, this.player);
     this.firestoreService.$game.subscribe(game => this.game = game);
     this.firestoreService.$playerDeck.subscribe(updatedPlayerDeck => {
       this.playerDeck = updatedPlayerDeck;
     });
     this.timerSubscription();
-  }
-
-  public connectToGame() {
-    this.firestoreService.connectGame(this.gameId, this.userName);
   }
 
   public startGame() {
@@ -62,7 +58,7 @@ export class LobbyComponent implements OnInit {
   // THROW CARD
   public cardToTable(cardPosition: number) {
     const card: Card = this.playerDeck[cardPosition];
-    if (this.game.lastUserCard !== null && this.game.lastUserCard.value !== card.value ||
+    if (this.game.lastPlayerCard !== null && this.game.lastPlayerCard.value !== card.value ||
       this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 14 && card.value !== 14 ||
       this.game.drawCardsCounter !== 0 && this.game.tableCard[this.game.tableCard.length - 1].value === 10 && card.value !== 10) {
       return;
@@ -74,7 +70,7 @@ export class LobbyComponent implements OnInit {
           break;
         case 10: // +2
           this.game.drawCardsCounter += 2;
-          this.game.userDrawCard = true;
+          this.game.playerDrawCard = true;
           break;
         case 11: // reverse
           this.game.reverseDirection = !this.game.reverseDirection;
@@ -88,17 +84,18 @@ export class LobbyComponent implements OnInit {
         case 14: // +4
           this.game.tableColor = null;
           this.game.drawCardsCounter += 4;
-          this.game.userDrawCard = true;
+          this.game.playerDrawCard = true;
           break;
       }
       this.onValidMove(cardPosition, card);
+      this.firestoreService.updateGame();
     }
 
   }
 
   public onValidMove(cardPosition: number, card: Card) {
     this.game.tableCard.push(card);
-    this.game.lastUserCard = card;
+    this.game.lastPlayerCard = card;
     if (card.color !== 4) {
       this.game.tableColor = card.color;
     }
@@ -106,7 +103,7 @@ export class LobbyComponent implements OnInit {
   }
 
   public isValidMove(card: Card): boolean {
-    return (this.game.lastUserCard === null && this.isSameColor(card)) || this.isSameNumber(card) || card.color === 4;
+    return (this.game.lastPlayerCard === null && this.isSameColor(card)) || this.isSameNumber(card) || card.color === 4;
   }
 
   public isSameColor(card: Card) {
@@ -130,7 +127,7 @@ export class LobbyComponent implements OnInit {
       this.game.drawCardsCounter = 0;
       return;
     }
-    this.game.userDrawCard = true;
+    this.game.playerDrawCard = true;
     this.playerDeck.push(this.firestoreService.drawCards(1)[0]);
   }
 
@@ -143,33 +140,33 @@ export class LobbyComponent implements OnInit {
       this.game.gameFinished = true; // game finished
       this.setWinners();
     }
-    if (!this.game.userDrawCard) {
+    if (!this.game.playerDrawCard) {
       if (this.game.drawCardsCounter !== 0) {
         for (let i = 0; i < this.game.drawCardsCounter; i++) {
           this.drawCard();
         }
         this.game.drawCardsCounter = 0;
         this.game.nextPlayerCounter = 0;
-      } else if (!this.game.lastUserCard) {
+      } else if (!this.game.lastPlayerCard) {
         this.game.nextPlayerCounter++;
       }
     }
-    this.game.decksLength[this.game.playerTurn] = {player: this.userName, length: this.playerDeck.length};
+    this.game.decksLength[this.game.playerTurn] = {player: this.player, length: this.playerDeck.length};
     if (this.game.drawCardsCounter === 0) {
       this.checkForWinner();
     }
     if (this.game.skipTurnCounter === 0 && (this.game.players.length > 2 ||
-      this.game.lastUserCard === null || this.game.lastUserCard.value !== 11)) {
+      this.game.lastPlayerCard === null || this.game.lastPlayerCard.value !== 11)) {
       this.increasePlayerTurn();
     } else if (this.game.players.length > 2) {
       for (let i = 0; i <= this.game.skipTurnCounter; i++) {
         this.increasePlayerTurn();
       }
     }
-    this.game.userDrawCard = false;
-    this.game.lastUserCard = null;
+    this.game.playerDrawCard = false;
+    this.game.lastPlayerCard = null;
     this.game.skipTurnCounter = 0;
-    this.firestoreService.updatePlayersDeck(this.playerDeck, this.userName);
+    this.firestoreService.updatePlayersDeck(this.playerDeck, this.player);
     this.firestoreService.$game.next(this.game);
     this.firestoreService.updateGame();
   }
@@ -206,6 +203,5 @@ export class LobbyComponent implements OnInit {
     for (const winner of winners) {
       this.game.winners.push(winner.player);
     }
-    this.firestoreService.updateGame();
   }
 }

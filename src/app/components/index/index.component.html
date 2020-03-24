@@ -13,17 +13,17 @@
   </label>
 </mat-form-field>
 <mat-form-field appearance="outline">
-  <mat-label>Username</mat-label>
+  <mat-label>Name</mat-label>
   <label>
-    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="userName">
+    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="player">
   </label>
 </mat-form-field>
 <button mat-flat-button color="primary"
-        [disabled]="!gameId || !gamePassword || !userName" (click)="createGame()">
+        [disabled]="!gameId || !gamePassword || !player" (click)="createGame()">
   Create Game
 </button>
 <button mat-flat-button color="primary"
-        [disabled]="!gameId || !gamePassword || !userName" (click)="joinGame()">
+        [disabled]="!gameId || !gamePassword || !player" (click)="joinGame()">
   Join Game
 </button>
 <hr>

@@ -12,7 +12,7 @@
 
 
   <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
-    <button mat-flat-button *ngIf=" game.players[0] === this.userName && game.players.length >= 2"
+    <button mat-flat-button *ngIf=" game.players[0] === this.player && game.players.length >= 2"
             (click)="startGame()"
             color="accent">
       start
@@ -30,7 +30,7 @@
     </div>
 
     <!--Timer-->
-    <h3 *ngIf="this.game.players[this.game.playerTurn] === this.userName">time left ---> {{timer}}</h3>
+    <h3 *ngIf="this.game.players[this.game.playerTurn] === this.player">time left ---> {{timer}}</h3>
 
     <!--select color-->
     <div *ngIf="this.game.tableColor !== null"
@@ -59,18 +59,18 @@
       <app-card [card]="this.game.tableCard[this.game.tableCard.length - 1]"></app-card>
     </div>
     <br><br><br><br>
-    <div class="user-deck-container"
-         [ngClass]="{'disabled': (this.game.players[this.game.playerTurn] !== this.userName || this.game.tableColor === null)}">
+    <div class="player-deck-container"
+         [ngClass]="{'disabled': (this.game.players[this.game.playerTurn] !== this.player || this.game.tableColor === null)}">
       <app-card *ngFor="let card of playerDeck; let i = index" [card]="card" (click)="cardToTable(i)"></app-card>
       <br>
       <button mat-flat-button color="accent" [disabled]="
-      this.game.players[this.game.playerTurn] !== this.userName || this.game.drawCardsCounter !== 0 ||
-      this.game.lastUserCard !== null || this.game.deck.length === 0 || this.game.userDrawCard"
+      this.game.players[this.game.playerTurn] !== this.player || this.game.drawCardsCounter !== 0 ||
+      this.game.lastPlayerCard !== null || this.game.deck.length === 0 || this.game.playerDrawCard"
               (click)="drawCard()">
         Draw card
       </button>
-      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.userName ||
-    !this.game.userDrawCard && this.game.lastUserCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0"
+      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.player ||
+    !this.game.playerDrawCard && this.game.lastPlayerCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0"
               (click)="nextPlayer()">
         Next player
       </button>

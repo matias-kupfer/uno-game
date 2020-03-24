@@ -1,14 +1,11 @@
 import {Router} from '@angular/router';
 import {Injectable} from '@angular/core';
 import {MatSnackBar} from '@angular/material';
-import {DocumentData} from '@angular/fire/firestore';
 
 import * as firebase from 'firebase';
 
 import {BehaviorSubject} from 'rxjs';
-// User defined
 import {Game} from '../../interfaces';
-import {DeckService} from './deck.service';
 import {Collection, FirebaseDoc, UnoParams} from '../../enums';
 import editable from '../../functions/editable.function';
 import FieldValue = firebase.firestore.FieldValue;
@@ -26,39 +23,31 @@ export class FirestoreService {
   public player: string;
   public turnInterval: number;
 
-  constructor(private deckService: DeckService, private snackBar: MatSnackBar, private router: Router) {
+  constructor(private snackBar: MatSnackBar, private router: Router) {
   }
 
-  public connectGame(gameId: string, userName: string): DocumentData {
-    return this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
+  public connectGame(gameId: string, player: string) {
+    this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
-        if (this.checkValidUser(res.data().players, userName)) {
+        if (this.checkValidPlayer(res.data().players, player)) { // the player is on the list
           if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) { // game started
-            this.snackBar.open('game started', '', {
-              duration: 3000
-            });
+            this.snackBar.open('game started', '', {duration: 3000});
             this.playerDeckSubscription();
           }
           if (res.data().gameFinished === true && !this.$game.getValue().gameFinished) { // game finished
-            this.snackBar.open('game finished', '', {
-              duration: 3000
-            });
+            this.snackBar.open('game finished', '', {duration: 3000});
           }
-          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) { // user turn
+          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) { // player turn
             this.timer();
           }
-          this.player = userName;
+          this.player = player;
           this.$game.next(res.data() as Game);
         } else {
-          this.snackBar.open('access denied for some fucking reason', '', {
-            duration: 3000
-          });
+          this.snackBar.open('access denied for some fucking reason', '', {duration: 3000});
           this.router.navigate(['home']);
         }
       } else {
-        this.snackBar.open('access denied (no exist)', '', {
-          duration: 3000
-        });
+        this.snackBar.open('access denied (no exist)', '', {duration: 3000});
         this.router.navigate(['home']);
       }
     });
@@ -135,9 +124,9 @@ export class FirestoreService {
       });
   }
 
-  public checkValidUser(gamePlayersList: string[], userName: string) {
-    for (const user of gamePlayersList) {
-      if (user === userName) {
+  public checkValidPlayer(gamePlayersList: string[], newPlayer: string) {
+    for (const player of gamePlayersList) {
+      if (player === newPlayer) {
         return true;
       }
     }

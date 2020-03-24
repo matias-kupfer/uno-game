@@ -16,10 +16,10 @@ export interface Game {
     length: number
   }];
   playerTurn: number;
-  userDrawCard: boolean;
+  playerDrawCard: boolean;
   skipTurnCounter: number;
   drawCardsCounter: number;
-  lastUserCard: Card;
+  lastPlayerCard: Card;
   reverseDirection: boolean;
   tableColor: number;
 }

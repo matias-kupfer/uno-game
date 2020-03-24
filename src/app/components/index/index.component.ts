@@ -12,7 +12,7 @@ import {ApiResponse} from '../../interfaces/api-response';
 export class IndexComponent implements OnInit {
   public gameId: string = '2';
   public gamePassword: string = '1234';
-  public userName: string;
+  public player: string;
 
   constructor(private apiService: ApiService, private snackBar: MatSnackBar, private router: Router) {
   }
@@ -21,12 +21,12 @@ export class IndexComponent implements OnInit {
   }
 
   public createGame() {
-    this.apiService.createGame(this.gameId, this.gamePassword, this.userName).subscribe((res: ApiResponse) => {
+    this.apiService.createGame(this.gameId, this.gamePassword, this.player).subscribe((res: ApiResponse) => {
       if (res.success) {
         this.snackBar.open(res.message, '', {
           duration: 5000
         });
-        this.router.navigate(['lobby/' + this.gameId + '/' + this.userName]);
+        this.router.navigate(['lobby/' + this.gameId + '/' + this.player]);
       } else {
         this.snackBar.open(res.message, '', {
           duration: 5000
@@ -36,12 +36,12 @@ export class IndexComponent implements OnInit {
   }
 
   public joinGame() {
-    this.apiService.joinGame(this.gameId, this.gamePassword, this.userName).subscribe((res: ApiResponse) => {
+    this.apiService.joinGame(this.gameId, this.gamePassword, this.player).subscribe((res: ApiResponse) => {
       if (res.success) {
         this.snackBar.open(res.message, '', {
           duration: 5000
         });
-        this.router.navigate(['lobby/' + this.gameId + '/' + this.userName]);
+        this.router.navigate(['lobby/' + this.gameId + '/' + this.player]);
       } else {
         this.snackBar.open(res.message, '', {
           duration: 5000
