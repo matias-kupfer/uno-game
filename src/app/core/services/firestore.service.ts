@@ -30,24 +30,27 @@ export class FirestoreService {
     this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
         if (this.checkValidPlayer(res.data().players, player)) { // the player is on the list
-          if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) { // game started
-            this.snackBar.open('game started', '', {duration: 3000});
+          // game started
+          if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) {
+            this.snackBar.open('Game started', '', {duration: 3000});
             this.playerDeckSubscription();
           }
-          if (res.data().gameFinished === true && !this.$game.getValue().gameFinished) { // game finished
-            this.snackBar.open('game finished', '', {duration: 3000});
+          // game finished
+          if (res.data().gameFinished === true && !this.$game.getValue().gameFinished) {
+            this.snackBar.open('Game ended', '', {duration: 3000});
           }
-          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) { // player turn
+          // player turn
+          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) {
             this.timer();
           }
           this.player = player;
           this.$game.next(res.data() as Game);
         } else {
-          this.snackBar.open('access denied for some fucking reason', '', {duration: 3000});
+          this.snackBar.open('access denied', '', {duration: 3000});
           this.router.navigate(['home']);
         }
       } else {
-        this.snackBar.open('access denied (no exist)', '', {duration: 3000});
+        this.snackBar.open('Game does not exist', '', {duration: 3000});
         this.router.navigate(['home']);
       }
     });
@@ -66,15 +69,9 @@ export class FirestoreService {
       });
   }
 
-  public deckLengthInit(game: Game) {
-    const decksLength = [];
-    for (const player of game.players) {
-      decksLength.push({
-        player,
-        length: 7
-      });
-    }
-    return decksLength;
+  public updateGame() {
+    this.db.collection(Collection.Games).doc(this.$game.getValue().gameId)
+      .set(editable(this.$game.getValue()));
   }
 
   public timer() {
@@ -88,23 +85,22 @@ export class FirestoreService {
     }, 1000);
   }
 
-  public updateGame() {
-    this.db.collection(Collection.Games).doc(this.$game.getValue().gameId)
-      .set(editable(this.$game.getValue()));
+  public checkValidPlayer(gamePlayersList: string[], newPlayer: string) {
+    for (const player of gamePlayersList) {
+      if (player === newPlayer) {
+        return true;
+      }
+    }
+    return false;
   }
 
+
+  // Deck
   public playerDeckSubscription() {
     this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(this.player).doc(FirebaseDoc.PlayerDeck)
       .onSnapshot(updatedPlayerDeck => {
         this.$playerDeck.next(updatedPlayerDeck.data().playerDeck);
       });
-  }
-
-  public drawCards(quantity: number): Card[] {
-    const cards = this.$game.getValue().deck.slice(0, quantity);
-    this.$game.getValue().deck.splice(0, quantity);
-    this.updateGame();
-    return cards;
   }
 
   public generatePlayerDecks() {
@@ -117,6 +113,17 @@ export class FirestoreService {
     }
   }
 
+  public deckLengthInit(game: Game) {
+    const decksLength = [];
+    for (const player of game.players) {
+      decksLength.push({
+        player,
+        length: 7
+      });
+    }
+    return decksLength;
+  }
+
   async updatePlayersDeck(playerDeck: Card[], player: string) {
     await this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(player).doc(FirebaseDoc.PlayerDeck)
       .set({
@@ -124,13 +131,11 @@ export class FirestoreService {
       });
   }
 
-  public checkValidPlayer(gamePlayersList: string[], newPlayer: string) {
-    for (const player of gamePlayersList) {
-      if (player === newPlayer) {
-        return true;
-      }
-    }
-    return false;
+  public drawCards(quantity: number): Card[] {
+    const cards = this.$game.getValue().deck.slice(0, quantity);
+    this.$game.getValue().deck.splice(0, quantity);
+    this.updateGame();
+    return cards;
   }
 
   async getPlayersDeck(player: string) {

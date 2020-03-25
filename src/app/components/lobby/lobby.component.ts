@@ -50,12 +50,13 @@ export class LobbyComponent implements OnInit {
       if (timer === 0) {
         this.drawCard();
         this.drawCard();
+        this.drawCounterCards();
         this.nextPlayer();
       }
     });
   }
 
-  // THROW CARD
+  // CARD ACTIONS
   public cardToTable(cardPosition: number) {
     const card: Card = this.playerDeck[cardPosition];
     if (this.game.lastPlayerCard !== null && this.game.lastPlayerCard.value !== card.value ||
@@ -131,6 +132,14 @@ export class LobbyComponent implements OnInit {
     this.playerDeck.push(this.firestoreService.drawCards(1)[0]);
   }
 
+  public drawCounterCards() {
+    for (let i = 0; i < this.game.drawCardsCounter; i++) {
+      this.drawCard();
+    }
+    this.game.drawCardsCounter = 0;
+    this.game.nextPlayerCounter = 0;
+  }
+
   public changeColor() {
     this.nextPlayer();
   }
@@ -142,11 +151,7 @@ export class LobbyComponent implements OnInit {
     }
     if (!this.game.playerDrawCard) {
       if (this.game.drawCardsCounter !== 0) {
-        for (let i = 0; i < this.game.drawCardsCounter; i++) {
-          this.drawCard();
-        }
-        this.game.drawCardsCounter = 0;
-        this.game.nextPlayerCounter = 0;
+        this.drawCounterCards();
       } else if (!this.game.lastPlayerCard) {
         this.game.nextPlayerCounter++;
       }
@@ -184,7 +189,7 @@ export class LobbyComponent implements OnInit {
   public checkForWinner() {
     for (const playerDeck of this.game.decksLength) {
       if (playerDeck.length === 0) {
-        this.game.gameFinished = true; // game finished
+        this.game.gameFinished = true;
         this.game.winners.push(playerDeck.player);
         break;
       }
