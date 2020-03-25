@@ -29,7 +29,8 @@ export class FirestoreService {
   public connectGame(gameId: string, player: string) {
     this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
-        if (this.checkValidPlayer(res.data().players, player)) { // the player is on the list
+        if (this.$game.getValue() === null && this.checkValidPlayer(res.data().players, player) ||
+          this.$game.getValue() !== null) { // the player is on the list
           // game started
           if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) {
             this.snackBar.open('Game started', '', {duration: 3000});
@@ -57,8 +58,8 @@ export class FirestoreService {
   }
 
   public startGame(gameId: string, game: Game) {
-    this.generatePlayerDecks();
     const tableCard = this.drawCards(UnoParams.CardsDrawnIfNothing)[0];
+    this.generatePlayerDecks();
     return this.db.collection(Collection.Games).doc(gameId).update(
       {
         gameStarted: true,
