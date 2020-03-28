@@ -20,6 +20,7 @@ export class FirestoreService {
   public $game: BehaviorSubject<Game> = new BehaviorSubject<Game>(null);
   public $timer: BehaviorSubject<number> = new BehaviorSubject<number>(null);
   public $playerDeck: BehaviorSubject<Card[]> = new BehaviorSubject<Card[]>(null);
+  public $unsubscribe: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public player: string;
   public turnInterval: number;
 
@@ -27,7 +28,7 @@ export class FirestoreService {
   }
 
   public connectGame(gameId: string, player: string) {
-    this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
+    const unsubscribe = this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
         if (this.$game.getValue() === null && this.checkValidPlayer(res.data().players, player) ||
           this.$game.getValue() !== null) { // the player is on the list
@@ -42,7 +43,9 @@ export class FirestoreService {
           }
           // player turn
           if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) {
-            this.timer();
+            if (res.data().lastPlayerCard === null) {
+              this.timer();
+            }
           }
           this.player = player;
           this.$game.next(res.data() as Game);
@@ -53,6 +56,11 @@ export class FirestoreService {
       } else {
         this.snackBar.open('Game does not exist', '', {duration: 3000});
         this.router.navigate(['home']);
+      }
+    });
+    this.$unsubscribe.subscribe(unsubscribeValue => {
+      if (unsubscribeValue) {
+        unsubscribe();
       }
     });
   }
@@ -98,10 +106,19 @@ export class FirestoreService {
 
   // Deck
   public playerDeckSubscription() {
-    this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(this.player).doc(FirebaseDoc.PlayerDeck)
-      .onSnapshot(updatedPlayerDeck => {
-        this.$playerDeck.next(updatedPlayerDeck.data().playerDeck);
-      });
+    const unsubscribe =
+      this.db.collection(Collection.Games).doc(this.$game.getValue().gameId).collection(this.player).doc(FirebaseDoc.PlayerDeck)
+        .onSnapshot(updatedPlayerDeck => {
+            if (updatedPlayerDeck.exists) {
+              this.$playerDeck.next(updatedPlayerDeck.data().playerDeck);
+            }
+          }
+        );
+    this.$unsubscribe.subscribe(unsubscribeValue => {
+      if (unsubscribeValue) {
+        unsubscribe();
+      }
+    });
   }
 
   public generatePlayerDecks() {
@@ -137,9 +154,5 @@ export class FirestoreService {
     this.$game.getValue().deck.splice(0, quantity);
     this.updateGame();
     return cards;
-  }
-
-  async getPlayersDeck(player: string) {
-    return this.db.collection('games').doc(this.$game.getValue().gameId).collection(player).doc('playerDeck').get();
   }
 }

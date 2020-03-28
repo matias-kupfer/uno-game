@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ApiService} from '../../core/services/api.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FirestoreService} from '../../core/services/firestore.service';
@@ -12,7 +12,7 @@ import {Card} from '../../class/card';
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.scss']
 })
-export class LobbyComponent implements OnInit {
+export class LobbyComponent implements OnInit, OnDestroy {
   public game: Game = null;
   public playerDeck: Card[] = null;
   public gameId: string = this.route.snapshot.paramMap.get('gameId');
@@ -27,12 +27,20 @@ export class LobbyComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.firestoreService.$unsubscribe.next(false);
     this.firestoreService.connectGame(this.gameId, this.player);
     this.firestoreService.$game.subscribe(game => this.game = game);
     this.firestoreService.$playerDeck.subscribe(updatedPlayerDeck => {
       this.playerDeck = updatedPlayerDeck;
     });
     this.timerSubscription();
+  }
+
+  ngOnDestroy(): void {
+    this.firestoreService.$unsubscribe.next(true);
+    this.firestoreService.$playerDeck.next(null);
+    this.firestoreService.$game.next(null);
+    this.firestoreService.$timer.next(null);
   }
 
   public startGame() {
@@ -50,7 +58,12 @@ export class LobbyComponent implements OnInit {
       if (timer === 0) {
         this.drawCard();
         this.drawCard();
-        this.drawCounterCards();
+        if (this.game.lastPlayerCard === null) {
+          this.drawCounterCards();
+        }
+        if (this.game.tableColor === null) {
+          this.game.tableColor = Math.floor(Math.random() * 4);
+        }
         this.nextPlayer();
       }
     });

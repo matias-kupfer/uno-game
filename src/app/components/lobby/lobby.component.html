@@ -37,7 +37,7 @@
          [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' :
          this.game.tableColor === 2 ? 'yellow' : 'green'}"
          style="width: 100px; height: 100px"></div>
-    <ng-container *ngIf="this.game.tableColor === null">
+    <ng-container *ngIf="this.game.tableColor === null && this.game.players[this.game.playerTurn] === this.player">
       <label id="example-radio-group-label">Pick color</label>
       <mat-radio-group (change)="changeColor()" [(ngModel)]="this.game.tableColor">
         <mat-radio-button [value]="0">
