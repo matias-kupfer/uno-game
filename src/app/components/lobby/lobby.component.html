@@ -91,7 +91,7 @@
       <h1 *ngFor="let winner of game.winners" style="font-weight: bold; color: green">{{winner}}</h1>
     </div>
   </div>
-
-  <ng-template #loader>
-    <mat-spinner (progress)="50" color="accent"></mat-spinner>
-  </ng-template>
+</ng-container>
+<ng-template #loader>
+  <mat-spinner (progress)="50" color="accent"></mat-spinner>
+</ng-template>

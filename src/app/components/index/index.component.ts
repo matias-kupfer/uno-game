@@ -13,8 +13,8 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent implements OnInit, OnDestroy {
-  private ngUnsubscribe = new Subject();
-  private gameForm: FormGroup;
+  public ngUnsubscribe = new Subject();
+  public gameForm: FormGroup;
 
   constructor(private apiService: ApiService,
               private snackBar: MatSnackBar,
