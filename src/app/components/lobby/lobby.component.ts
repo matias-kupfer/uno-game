@@ -48,14 +48,13 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.snackBar.open('error starting the game', '', {
         duration: 3000
       });
-      console.log(e);
     });
   }
 
   public timerSubscription() {
     this.firestoreService.$timer.subscribe(timer => {
       this.timer = timer;
-      if (timer === 0) {
+      if (timer === 0 && this.game.players[this.game.playerTurn] === this.player) {
         this.drawCard();
         this.drawCard();
         if (this.game.lastPlayerCard === null) {
@@ -153,7 +152,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.game.nextPlayerCounter = 0;
   }
 
-  public changeColor() {
+  public changeColor(color: number) {
+    this.game.tableColor = color;
     this.nextPlayer();
   }
 
@@ -185,6 +185,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.game.lastPlayerCard = null;
     this.game.skipTurnCounter = 0;
     this.firestoreService.updatePlayersDeck(this.playerDeck, this.player);
+    this.firestoreService.$timer.next(20);
     this.firestoreService.$game.next(this.game);
     this.firestoreService.updateGame();
   }
@@ -220,6 +221,23 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
     for (const winner of winners) {
       this.game.winners.push(winner.player);
+    }
+  }
+
+  public getLength(length: number) {
+    return Array(length).fill(null); // [4,4,4,4,4]
+  }
+
+  public getSpecialCardColor() {
+    switch (this.game.tableColor) {
+      case 0:
+        return 'red';
+      case 1:
+        return 'blue';
+      case 2:
+        return 'yellow';
+      case 3:
+        return 'green';
     }
   }
 }

@@ -1,9 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap');
+
 html, body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: white;
+  font-family: 'Roboto', sans-serif;
   background-color: #222222;
+}
+
+* {
+  outline: none;
+}
+
+mat-icon {
+  vertical-align: middle;
+}
+
+button {
+  width: 45%;
+  border: none;
+  padding: 20px;
+  font-size: 1.8em;
+  color: white;
+  font-weight: bold;
+  transition: 0.5s;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.create-game-btn {
+  background-color: #C35815;
+  box-shadow: 0 5px #934813;
+}
+
+.join-game-btn {
+  background-color: #0D7B09;
+  box-shadow: 0 5px #0d5e09;
+}
+
+div.color0 {
+  background-color: #C10000;
+}
+
+div.color1 {
+  background-color: #0D59B2;
+}
+
+div.color2 {
+  background-color: #d8d819;
+}
+
+div.color3 {
+  background-color: #19A31E;
+}
+
+div.color4 {
+  background-color: black;
 }

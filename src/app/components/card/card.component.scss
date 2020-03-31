@@ -1,36 +1,88 @@
 div.card {
-  width: 50px;
-  height: 100px;
+  margin: 0 -40px -50px;
+  width: 200px;
   display: flex;
+  border-radius: 10px;
+  height: 300px;
   justify-content: center;
   align-items: center;
   transition: 0.5s;
-
-  &:hover {
-    transform: scale(1.2);
-  }
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  position: relative;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   h3 {
-    font-size: 3em;
+    font-weight: 100;
+    font-size: 4em;
+  }
+
+  mat-icon {
+    transform: scale(2);
+  }
+
+  span {
+    position: absolute;
+    font-size: 20px;
+    font-weight: 100;
+
+    mat-icon {
+      transform: scale(0.8);
+    }
+  }
+
+  .top {
+    top: 15px;
+    left: 15px;
+  }
+
+  .bottom {
+    bottom: 15px;
+    right: 15px;
+  }
+
+}
+
+div.table {
+  cursor: default;
+}
+
+div.player-deck {
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-60px) translateX(-20px);
   }
 }
 
-div.color0 {
-  border: solid red;
+
+div.hidden-card {
+  background-color: #797979;
+  cursor: not-allowed;
+  margin: -40px -30px 0;
+
+  &:hover {
+    transform: none;
+  }
 }
 
-div.color1 {
-  border: solid blue;
+
+div.deck {
+  background-color: #797979;
+  cursor: pointer;
+  margin: 0;
+
+  &:hover {
+    transform: none;
+  }
 }
 
-div.color2 {
-  border: solid yellow;
-}
 
-div.color3 {
-  border: solid green;
-}
 
-div.color4 {
-  background-color: black;
-}
+
+
+
+
+

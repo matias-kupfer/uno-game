@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Card } from '../../class/card';
+import {Component, Input, OnInit} from '@angular/core';
+import {Card} from '../../class/card';
 
 
 @Component({
@@ -9,7 +9,13 @@ import { Card } from '../../class/card';
 })
 export class CardComponent implements OnInit {
   @Input() card: Card;
+  @Input() width: number;
+  @Input() type: string;
 
+  // player-deck
+  // table
+  // deck
+  // hidden
 
   constructor() {
   }

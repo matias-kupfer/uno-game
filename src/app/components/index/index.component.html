@@ -1,29 +1,57 @@
-<h1>Welcome to UNO | By Matias Kupfer</h1>
-<h3>CREATE A GAME</h3>
-<mat-form-field appearance="outline">
-  <mat-label>Game name</mat-label>
-  <label>
-    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="gameId">
-  </label>
-</mat-form-field>
-<mat-form-field appearance="outline">
-  <mat-label>Game password</mat-label>
-  <label>
-    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="gamePassword">
-  </label>
-</mat-form-field>
-<mat-form-field appearance="outline">
-  <mat-label>Name</mat-label>
-  <label>
-    <input matInput placeholder="Enter the name of the new game" [(ngModel)]="player">
-  </label>
-</mat-form-field>
-<button mat-flat-button color="primary"
-        [disabled]="!gameId || !gamePassword || !player" (click)="createGame()">
-  Create Game
-</button>
-<button mat-flat-button color="primary"
-        [disabled]="!gameId || !gamePassword || !player" (click)="joinGame()">
-  Join Game
-</button>
-<hr>
+<div class="form">
+  <h1>UNO GAME</h1>
+  <form [formGroup]="gameForm">
+    <label>
+      <input placeholder="Username" formControlName="player">
+      <mat-error *ngIf="player.errors && player.invalid && player.touched && player.errors.minlength">
+        Username is too <strong>short.</strong>
+      </mat-error>
+      <mat-error *ngIf="player.errors && player.invalid && player.touched && player.errors.required">
+        Username is <strong>required.</strong>
+      </mat-error>
+      <mat-error *ngIf="player.errors && player.invalid && player.touched && player.errors.maxlength">
+        Username is <strong>long.</strong>
+      </mat-error>
+    </label>
+
+    <label>
+      <input placeholder="Game name" formControlName="gameId">
+      <mat-error *ngIf="gameId.errors && gameId.invalid && gameId.touched && gameId.errors.minlength">
+        Game name is too <strong>short.</strong>
+      </mat-error>
+      <mat-error *ngIf="gameId.errors && gameId.invalid && gameId.touched && gameId.errors.required">
+        Game name is <strong>required.</strong>
+      </mat-error>
+      <mat-error *ngIf="gameId.errors && gameId.invalid && gameId.touched && gameId.errors.maxlength">
+        Game name is too <strong>long.</strong>
+      </mat-error>
+    </label>
+
+    <label>
+      <input placeholder="Game password" formControlName="gamePassword">
+      <mat-error
+        *ngIf="gamePassword.errors && gamePassword.invalid && gamePassword.touched && gamePassword.errors.minlength">
+        Password is too <strong>short.</strong>
+      </mat-error>
+      <mat-error
+        *ngIf="gamePassword.errors && gamePassword.invalid && gamePassword.touched && gamePassword.errors.required">
+        Password <strong>required.</strong>
+      </mat-error>
+      <mat-error
+        *ngIf="gamePassword.errors && gamePassword.invalid && gamePassword.touched && gamePassword.errors.maxlength">
+        Password is too <strong>long.</strong>
+      </mat-error>
+    </label>
+
+    <div class="buttons">
+      <button type="submit" class="index-btn create-game-btn" id="createGameBtn" (click)="createGame()"
+              [disabled]="gameForm.invalid" [ngClass]="{'disabled': gameForm.invalid}">
+        Create Game
+      </button>
+      <button type="submit" class="index-btn join-game-btn" id="joinGameBtn" (click)="joinGame()"
+              [disabled]="gameForm.invalid" [ngClass]="{'disabled': gameForm.invalid}">
+        Join Game
+      </button>
+    </div>
+  </form>
+</div>

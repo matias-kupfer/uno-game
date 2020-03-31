@@ -1,91 +1,97 @@
-<ng-container style="margin-left: 20px" *ngIf="game; else loader">
-  <h1>lobby</h1>
-  <h3>Game --> {{game.gameId}}</h3>
-  <h3>Password --> {{game.password}}</h3>
-  <div *ngIf="!game.gameFinished">
-    <h3>Player turn --> {{game.players[game.playerTurn]}}</h3>
-    <h3
-      [ngStyle]="{'color' : game.deck.length > 30 ? 'green' : game.deck.length < 30 && game.deck.length > 10 ? 'orange' : 'red'}">
-      Cards remaining --> {{game.deck.length}}</h3>
+<ng-container *ngIf="game; else loader">
+
+
+  <div class="game-preview" *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
+    <div class="game-info">
+      <h3>Game: {{game.gameId}}</h3>
+      <h3>Password: {{game.password}}</h3>
+    </div>
+    <div>
+      <h1 *ngFor="let playerList of game.players; let i = index"
+          [ngStyle]="{'color' : playerList === this.player ? 'green' : '', 'font-weight' :
+          playerList === this.player ? 'bold' : 'light'}">
+        {{playerList}} <span *ngIf="i === 0">*</span></h1>
+    </div>
+    <div class="info-footer">
+      <button class="join-game-btn" *ngIf=" game.players[0] === this.player && game.players.length > 1; else noAdmin"
+              (click)="startGame()"> start
+      </button>
+      <ng-template #noAdmin>
+        <h3>Waiting for {{game.players[0]}} to start the game...</h3>
+      </ng-template>
+    </div>
   </div>
-  <br>
 
 
-  <ng-container *ngIf="!game.gameStarted"> <!-- GAME NOT STARTED -->
-    <button mat-flat-button *ngIf=" game.players[0] === this.player && game.players.length >= 2"
-            (click)="startGame()"
-            color="accent">
-      start
-    </button>
-    <div *ngFor="let player of game.players; let i = index">
-      <h3 [ngStyle]="{'color' : i=== 0 ? 'green' : ''}">{{player}}</h3>
-    </div>
-  </ng-container>
+  <!-- GAME STARTED -->
+  <div class="outer" *ngIf="game.gameStarted && !this.game.gameFinished">
 
-
-  <ng-container *ngIf="game.gameStarted && !this.game.gameFinished"> <!-- GAME STARTED -->
-    <div *ngFor="let player of game.players; let i = index">
-      <h3 [ngStyle]="{'color' : i === this.game.playerTurn ? 'green' : ''}">{{player}} -
-        {{this.game.decksLength[i].length}} cards</h3>
+    <div class="players-deck-container">
+      <div *ngFor="let playerDeck of game.decksLength; let i = index"
+           [ngStyle]="{'display': playerDeck.player === player ? 'none' : 'block'}"
+           [ngClass]="{'user-turn': i === game.playerTurn}">
+        <div class="players-deck">
+          <app-card *ngFor="let card of getLength(playerDeck.length)" [card]="null" [width]="100"
+                    [type]="'hidden'"></app-card>
+        </div>
+        <h3>{{playerDeck.player}}</h3>
+      </div>
     </div>
 
-    <!--Timer-->
-    <h3 *ngIf="this.game.players[this.game.playerTurn] === this.player">time left ---> {{timer}}</h3>
-
-    <!--select color-->
-    <div *ngIf="this.game.tableColor !== null"
-         [ngStyle]="{'background-color': this.game.tableColor === 0 ? 'red' : this.game.tableColor === 1 ? 'blue' :
-         this.game.tableColor === 2 ? 'yellow' : 'green'}"
-         style="width: 100px; height: 100px"></div>
-    <ng-container *ngIf="this.game.tableColor === null && this.game.players[this.game.playerTurn] === this.player">
-      <label id="example-radio-group-label">Pick color</label>
-      <mat-radio-group (change)="changeColor()" [(ngModel)]="this.game.tableColor">
-        <mat-radio-button [value]="0">
-          red
-        </mat-radio-button>
-        <mat-radio-button [value]="1">
-          blue
-        </mat-radio-button>
-        <mat-radio-button [value]="2">
-          yellow
-        </mat-radio-button>
-        <mat-radio-button [value]="3">
-          green
-        </mat-radio-button>
-      </mat-radio-group>
-    </ng-container>
-
-    <div class="table-card">
-      <app-card [card]="this.game.tableCard[this.game.tableCard.length - 1]"></app-card>
+    <div class="center">
+      <app-card class="deck" [card]="null" [width]="200" [type]="'deck'" (click)="drawCard()" [ngClass]="{'not-allowed':
+        this.game.players[this.game.playerTurn] !== this.player || this.game.drawCardsCounter !== 0 ||
+        this.game.lastPlayerCard !== null || this.game.deck.length === 0 || this.game.playerDrawCard}"></app-card>
+      <app-card class="table" [card]="this.game.tableCard[this.game.tableCard.length - 1]"
+                [width]="200" [type]="'table'"
+                [ngStyle]="{'color': game.tableCard[game.tableCard.length - 1].color  === 4 ? getSpecialCardColor() :
+                'inherit'}">
+      </app-card>
+      <div class="next-btn" (click)="nextPlayer()" [ngClass]="{'not-allowed': this.game.players[this.game.playerTurn] !== this.player ||
+      !this.game.playerDrawCard && this.game.lastPlayerCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0
+      || game.tableColor === null}">
+        PASS
+      </div>
     </div>
-    <br><br><br><br>
+
     <div class="player-deck-container"
-         [ngClass]="{'disabled': (this.game.players[this.game.playerTurn] !== this.player || this.game.tableColor === null)}">
-      <app-card *ngFor="let card of playerDeck; let i = index" [card]="card" (click)="cardToTable(i)"></app-card>
-      <br>
-      <button mat-flat-button color="accent" [disabled]="
-      this.game.players[this.game.playerTurn] !== this.player || this.game.drawCardsCounter !== 0 ||
-      this.game.lastPlayerCard !== null || this.game.deck.length === 0 || this.game.playerDrawCard"
-              (click)="drawCard()">
-        Draw card
-      </button>
-      <button mat-flat-button color="accent" [disabled]="this.game.players[this.game.playerTurn] !== this.player ||
-    !this.game.playerDrawCard && this.game.lastPlayerCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0"
-              (click)="nextPlayer()">
-        Next player
-      </button>
+         [ngClass]="{'not-allowed': (this.game.players[this.game.playerTurn] !== this.player || this.game.tableColor === null)}">
+      <h1>{{player}}</h1>
+      <div class="player-deck">
+        <app-card *ngFor="let card of playerDeck; let i = index" (click)="cardToTable(i)"
+                  [card]="card" [width]="150" [type]="'player-deck'">
+        </app-card>
+      </div>
     </div>
-  </ng-container>
+
+    <div class="game-info">
+      <h3>{{game.gameId}}</h3>
+      <p>Players: {{game.players.length}}</p>
+      <p>Turn: {{game.players[game.playerTurn]}}</p>
+      <p>Cards to draw: {{game.drawCardsCounter}}</p>
+      <h1 *ngIf="this.game.players[this.game.playerTurn] === this.player"
+          [ngStyle]="{'color': timer < 10 && timer >= 5 ? 'orange' : timer < 5 ? 'red' : 'inherit'}">{{timer}}'</h1>
+    </div>
+
+    <div class="select-color" *ngIf="game.tableColor === null">
+      <div class="color0" (click)="changeColor(0)"></div>
+      <div class="color1" (click)="changeColor(1)"></div>
+      <div class="color2" (click)="changeColor(2)"></div>
+      <div class="color3" (click)="changeColor(3)"></div>
+    </div>
+
+    <div class="light"
+         [ngClass]="game.players[this.game.playerTurn] === this.player ? 'green-light' : 'red-light'"></div>
+  </div>
 
 
-  <ng-container *ngIf="this.game.gameFinished"> <!-- GAME FINISHED -->
-    <h1>GAME HAS ENDED</h1>
-    <h3>Winner/s: </h3>
-    <h3 *ngFor="let winner of game.winners">{{winner}}</h3>
-  </ng-container>
-</ng-container>
+  <!-- GAME FINISHED -->
+  <div class="game-preview" *ngIf="this.game.gameFinished">
+    <div>
+      <h1 *ngFor="let winner of game.winners" style="font-weight: bold; color: green">{{winner}}</h1>
+    </div>
+  </div>
 
-
-<ng-template #loader>
-  <mat-spinner (progress)="50" color="accent"></mat-spinner>
-</ng-template>
+  <ng-template #loader>
+    <mat-spinner (progress)="50" color="accent"></mat-spinner>
+  </ng-template>

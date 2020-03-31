@@ -42,10 +42,9 @@ export class FirestoreService {
             this.snackBar.open('Game ended', '', {duration: 3000});
           }
           // player turn
-          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player) {
-            if (res.data().lastPlayerCard === null) {
-              this.timer();
-            }
+          if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player &&
+            res.data().playerTurn !== this.$game.getValue().playerTurn) {
+            this.timer();
           }
           this.player = player;
           this.$game.next(res.data() as Game);

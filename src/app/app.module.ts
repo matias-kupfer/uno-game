@@ -1,18 +1,17 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { HttpClientModule } from '@angular/common/http';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
+import {HttpClientModule} from '@angular/common/http';
+import {AngularFireModule} from '@angular/fire';
+import {AngularFirestoreModule} from '@angular/fire/firestore';
+import {AngularFireDatabaseModule} from '@angular/fire/database';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CardComponent } from './components/card/card.component';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {CardComponent} from './components/card/card.component';
 import {
   MatButtonModule,
-  MatFormFieldModule,
   MatIconModule,
   MatInputModule,
   MatProgressSpinnerModule,
@@ -20,14 +19,15 @@ import {
   MatSliderModule,
   MatSnackBarModule
 } from '@angular/material';
-import { FormsModule } from '@angular/forms';
-import { IndexComponent } from './components/index/index.component';
-import { LobbyComponent } from './components/lobby/lobby.component';
-import { environment } from '../environments/environment';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {IndexComponent} from './components/index/index.component';
+import {LobbyComponent} from './components/lobby/lobby.component';
+import {environment} from '../environments/environment';
 
 
 import * as firebase from 'firebase/app';
-import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
+import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
+import { DesignComponent } from './components/design/design.component';
 
 
 firebase.initializeApp(environment.firebase);
@@ -38,6 +38,7 @@ firebase.initializeApp(environment.firebase);
     CardComponent,
     IndexComponent,
     LobbyComponent,
+    DesignComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,11 +53,11 @@ firebase.initializeApp(environment.firebase);
     MatSliderModule,
     FormsModule,
     MatButtonModule,
-    MatFormFieldModule,
     MatInputModule,
     MatRadioModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ReactiveFormsModule
   ],
   providers: [Location, {provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]

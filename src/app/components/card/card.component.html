@@ -1,20 +1,50 @@
-<div class="card" [ngClass]="'color' + card.color">
-  <h3 *ngIf="card.value < 10; else special">{{card.value}}</h3>
+<div *ngIf="card !== null" class="card {{type}}"
+     [ngStyle]="{width: width + 'px', height: width + (width / 2) + 'px'}"
+     [ngClass]="'color' + card.color">
+  <ng-container *ngIf="card.value < 10; else special">
+    <h3>{{card.value}}</h3>
+    <span class="top">{{card.value}}</span>
+    <span class="bottom">{{card.value}}</span>
+  </ng-container>
   <ng-template #special>
     <ng-container *ngIf="card.value === 10">
       <h3>+2</h3>
+      <span class="top">+2</span>
+      <span class="bottom">+2</span>
     </ng-container>
     <ng-container *ngIf="card.value === 11">
       <mat-icon>screen_rotation</mat-icon>
+      <span class="top"><mat-icon>screen_rotation</mat-icon></span>
+      <span class="bottom"><mat-icon>screen_rotation</mat-icon></span>
     </ng-container>
     <ng-container *ngIf="card.value === 12">
       <mat-icon>not_interested</mat-icon>
+      <span class="top"><mat-icon>not_interested</mat-icon></span>
+      <span class="bottom"><mat-icon>not_interested</mat-icon></span>
     </ng-container>
     <ng-container *ngIf="card.value === 13">
       <mat-icon>color_lens</mat-icon>
+      <span class="top"><mat-icon>color_lens</mat-icon></span>
+      <span class="bottom"><mat-icon>color_lens</mat-icon></span>
     </ng-container>
     <ng-container *ngIf="card.value === 14">
       <h3>+4</h3>
+      <span class="top">+4</span>
+      <span class="bottom">+4</span>
     </ng-container>
   </ng-template>
+</div>
+
+<div class="card hidden-card" *ngIf="type === 'hidden'"
+     [ngStyle]="{width: width + 'px', height: width + (width / 2) + 'px'}">
+  <h3>?</h3>
+  <span class="top">?</span>
+  <span class="bottom">?</span>
+</div>
+
+<div class="card deck" *ngIf="type === 'deck'"
+     [ngStyle]="{width: width + 'px', height: width + (width / 2) + 'px'}">
+  <h3>draw</h3>
+  <span class="top">?</span>
+  <span class="bottom">?</span>
 </div>
