@@ -31,29 +31,59 @@ export class FirestoreService {
     const unsubscribe = this.db.collection(Collection.Games).doc(gameId).onSnapshot((res) => {
       if (res.exists) {
         if (this.$game.getValue() === null && this.checkValidPlayer(res.data().players, player) ||
-          this.$game.getValue() !== null) { // the player is on the list
+          this.$game.getValue() !== null) {
           // game started
           if (res.data().gameStarted === true && !this.$game.getValue().gameStarted) {
-            this.snackBar.open('Game started', '', {duration: 3000});
+            this.snackBar.open('Game started', '', {
+              panelClass: 'custom-snackbar',
+              verticalPosition: 'top',
+              horizontalPosition: 'center',
+              duration: 3000
+            });
             this.playerDeckSubscription();
           }
           // game finished
           if (res.data().gameFinished === true && !this.$game.getValue().gameFinished) {
-            this.snackBar.open('Game ended', '', {duration: 3000});
+            this.snackBar.open('Game ended', '', {
+              panelClass: 'custom-snackbar',
+              verticalPosition: 'top',
+              horizontalPosition: 'center',
+              duration: 3000
+            });
           }
           // player turn
           if (res.data().gameStarted && res.data().players[res.data().playerTurn] === this.player &&
             res.data().playerTurn !== this.$game.getValue().playerTurn) {
+            let message = 'YOUR TURN TO PLAY!';
+            if (res.data().drawCardsCounter !== 0) {
+              message = message + ' There are ' + res.data().drawCardsCounter + ' cards to draw';
+            }
+            this.snackBar.open(message, '', {
+              panelClass: 'custom-snackbar',
+              verticalPosition: 'top',
+              horizontalPosition: 'center',
+              duration: 3000
+            });
             this.timer();
           }
           this.player = player;
           this.$game.next(res.data() as Game);
         } else {
-          this.snackBar.open('access denied', '', {duration: 3000});
+          this.snackBar.open('access denied', '', {
+            panelClass: ['custom-snackbar', 'danger-snackbar'],
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            duration: 3000
+          });
           this.router.navigate(['home']);
         }
       } else {
-        this.snackBar.open('Game does not exist', '', {duration: 3000});
+        this.snackBar.open('Game does not exist', '', {
+          panelClass: ['custom-snackbar', 'danger-snackbar'],
+          verticalPosition: 'top',
+          horizontalPosition: 'center',
+          duration: 3000
+        });
         this.router.navigate(['home']);
       }
     });

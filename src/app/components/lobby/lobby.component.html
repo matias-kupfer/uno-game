@@ -39,15 +39,16 @@
     </div>
 
     <div class="center">
-      <app-card class="deck" [card]="null" [width]="200" [type]="'deck'" (click)="drawCard()" [ngClass]="{'not-allowed':
-        this.game.players[this.game.playerTurn] !== this.player || this.game.drawCardsCounter !== 0 ||
+      <app-card class="deck" [card]="null" [width]="200" [type]="'deck'"
+                (click)="this.game.drawCardsCounter !== 0 && isPlayerTurn && drawCard()"
+                [ngClass]="{'not-allowed': !isPlayerTurn || this.game.drawCardsCounter !== 0 ||
         this.game.lastPlayerCard !== null || this.game.deck.length === 0 || this.game.playerDrawCard}"></app-card>
       <app-card class="table" [card]="this.game.tableCard[this.game.tableCard.length - 1]"
                 [width]="200" [type]="'table'"
                 [ngStyle]="{'color': game.tableCard[game.tableCard.length - 1].color  === 4 ? getSpecialCardColor() :
                 'inherit'}">
       </app-card>
-      <div class="next-btn" (click)="nextPlayer()" [ngClass]="{'not-allowed': this.game.players[this.game.playerTurn] !== this.player ||
+      <div class="next-btn" (click)="isPlayerTurn && nextPlayer()" [ngClass]="{'not-allowed': !isPlayerTurn ||
       !this.game.playerDrawCard && this.game.lastPlayerCard === null && this.game.drawCardsCounter === 0 && this.game.deck.length > 0
       || game.tableColor === null}">
         PASS
@@ -55,10 +56,11 @@
     </div>
 
     <div class="player-deck-container"
-         [ngClass]="{'not-allowed': (this.game.players[this.game.playerTurn] !== this.player || this.game.tableColor === null)}">
+         [ngStyle]="{'pointer-events': (!isPlayerTurn || this.game.tableColor === null) ? 'none' : ''}"
+         [ngClass]="{'not-allowed': (!isPlayerTurn || this.game.tableColor === null)}">
       <h1>{{player}}</h1>
       <div class="player-deck">
-        <app-card *ngFor="let card of playerDeck; let i = index" (click)="cardToTable(i)"
+        <app-card *ngFor="let card of playerDeck; let i = index" (click)="isPlayerTurn && cardToTable(i)"
                   [card]="card" [width]="150" [type]="'player-deck'">
         </app-card>
       </div>
@@ -68,12 +70,13 @@
       <h3>{{game.gameId}}</h3>
       <p>Players: {{game.players.length}}</p>
       <p>Turn: {{game.players[game.playerTurn]}}</p>
-      <p>Cards to draw: {{game.drawCardsCounter}}</p>
-      <h1 *ngIf="this.game.players[this.game.playerTurn] === this.player"
-          [ngStyle]="{'color': timer < 10 && timer >= 5 ? 'orange' : timer < 5 ? 'red' : 'inherit'}">{{timer}}'</h1>
+      <p [ngStyle]="{'color': game.drawCardsCounter !== 0 ? 'red' : 'inherit'}">Cards to
+        draw: {{game.drawCardsCounter}}</p>
+      <h1 *ngIf="isPlayerTurn"
+          [ngStyle]="{'color': timer < 10 && timer >= 5 ? 'orange' : timer < 5 ? 'red' : 'inherit'}">{{timer}}</h1>
     </div>
 
-    <div class="select-color" *ngIf="game.tableColor === null">
+    <div class="select-color" *ngIf="game.tableColor === null && isPlayerTurn">
       <div class="color0" (click)="changeColor(0)"></div>
       <div class="color1" (click)="changeColor(1)"></div>
       <div class="color2" (click)="changeColor(2)"></div>
@@ -86,7 +89,7 @@
 
 
   <!-- GAME FINISHED -->
-  <div class="game-preview" *ngIf="this.game.gameFinished">
+  <div class="game-preview" *ngIf="game.gameFinished">
     <div>
       <h1 *ngFor="let winner of game.winners" style="font-weight: bold; color: green">{{winner}}</h1>
     </div>

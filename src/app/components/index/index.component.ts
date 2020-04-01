@@ -64,11 +64,17 @@ export class IndexComponent implements OnInit, OnDestroy {
       takeUntil(this.ngUnsubscribe)).subscribe((res: ApiResponse) => {
       if (res.success) {
         this.snackBar.open(res.message, '', {
+          panelClass: 'custom-snackbar',
+          verticalPosition: 'top',
+          horizontalPosition: 'center',
           duration: 5000
         });
         this.router.navigate(['lobby/' + this.gameId.value + '/' + this.player.value]);
       } else {
         this.snackBar.open(res.message, '', {
+          panelClass: 'custom-snackbar',
+          verticalPosition: 'top',
+          horizontalPosition: 'center',
           duration: 5000
         });
       }
@@ -80,11 +86,17 @@ export class IndexComponent implements OnInit, OnDestroy {
       takeUntil(this.ngUnsubscribe)).subscribe((res: ApiResponse) => {
       if (res.success) {
         this.snackBar.open(res.message, '', {
+          panelClass: 'custom-snackbar',
+          verticalPosition: 'top',
+          horizontalPosition: 'center',
           duration: 5000
         });
         this.router.navigate(['lobby/' + this.gameId.value + '/' + this.player.value]);
       } else {
         this.snackBar.open(res.message, '', {
+          panelClass: 'custom-snackbar',
+          verticalPosition: 'top',
+          horizontalPosition: 'center',
           duration: 5000
         });
       }

@@ -18,6 +18,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   public gameId: string = this.route.snapshot.paramMap.get('gameId');
   public player: string = this.route.snapshot.paramMap.get('player');
   public timer: number = null;
+  public isPlayerTurn: boolean;
 
   constructor(
     private apiService: ApiService,
@@ -29,7 +30,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.firestoreService.$unsubscribe.next(false);
     this.firestoreService.connectGame(this.gameId, this.player);
-    this.firestoreService.$game.subscribe(game => this.game = game);
+    this.firestoreService.$game.subscribe(game => {
+      this.game = game;
+      if (game && game.gameStarted) {
+        this.isPlayerTurn = game.players[game.playerTurn] === this.player;
+      }
+    });
     this.firestoreService.$playerDeck.subscribe(updatedPlayerDeck => {
       this.playerDeck = updatedPlayerDeck;
     });
@@ -46,6 +52,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
   public startGame() {
     this.firestoreService.startGame(this.gameId, this.game).catch((e) => {
       this.snackBar.open('error starting the game', '', {
+        panelClass: 'custom-snackbar',
+        verticalPosition: 'top',
+        horizontalPosition: 'center',
         duration: 3000
       });
     });
@@ -135,6 +144,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
   public drawCard() {
     if (this.game.deck.length === 0) {
       this.snackBar.open('No more cards', '', {
+        panelClass: ['custom-snackbar', 'danger-snackbar'],
+        verticalPosition: 'top',
+        horizontalPosition: 'center',
         duration: 3000
       });
       this.game.drawCardsCounter = 0;
