@@ -252,4 +252,14 @@ export class LobbyComponent implements OnInit, OnDestroy {
         return 'green';
     }
   }
+
+  public onSkipPlayerBtn(): boolean {
+    return !this.isPlayerTurn || !this.game.playerDrawCard && this.game.lastPlayerCard === null &&
+      this.game.drawCardsCounter === 0 && this.game.deck.length > 0 || this.game.tableColor === null;
+  }
+
+  public onDrawCardBtn(): boolean {
+    return !this.isPlayerTurn || this.game.drawCardsCounter !== 0 || this.game.lastPlayerCard !== null ||
+      this.game.deck.length === 0 || this.game.playerDrawCard;
+  }
 }
